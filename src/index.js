@@ -1,17 +1,20 @@
-const { ApolloServer, gql } = require('apollo-server')
+const { ApolloServer, gql } = require('apollo-server-express')
+const express = require('express')
 const fs = require('fs')
 const Query = require('./resolvers/Query')
 
 // Type Definition 
-const typeDefs = gql`${fs.readFileSync(__dirname.concat('/schema.graphql'), 'utf8')}`;
+const typeDefs = gql`${fs.readFileSync(__dirname.concat('/schema.graphql'), 'utf8')}`
 
 // Resolvers
 const resolvers = {
 	Query: Query
 };
 
-const server = new ApolloServer({ typeDefs: typeDefs, resolvers: resolvers });
+const apolloServer = new ApolloServer({ typeDefs: typeDefs, resolvers: resolvers })
+const app = express()
+apolloServer.applyMiddleware({ app });
 
-server.listen().then(({ url }) => {
-	console.log(`Server ready at ${url}`);
+app.listen({port: 4000}, () => {
+	console.log(`Server ready at http://localhost:4000${apolloServer.graphqlPath}`)
 });
